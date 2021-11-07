@@ -7,6 +7,15 @@ import time
 
 
 def Jaccard_sim(shingle1:Shingle, shingle2:Shingle) -> float:
+    """[summary]
+
+    Args:
+        shingle1 (Shingle): [description]
+        shingle2 (Shingle): [description]
+
+    Returns:
+        float: [description]
+    """
     set1 = shingle1.shingle_set
     set2 = shingle2.shingle_set
     union = set1.union(set2)
@@ -34,7 +43,6 @@ print("Write path to the tsv file containing the jobs' announcements:")
 path = '/home/gianfree/Desktop/Data Mining/HW2/LSH/jobs.tsv'
 set_of_shingles = []
 
-print("Reading the file and extracting the shingles...")
 with open(path, 'r') as f:
     read_tsv = csv.reader(f, delimiter="\t")
     next(read_tsv) #just the head
@@ -84,5 +92,7 @@ print("LSH finds {} duplicates, the comparison of the shingles {}".format(len(si
 
 intersection = similar_docs_lsh.intersection(near_duplicates)
 #print("Intersection of the results of the two methods is: {}".format(intersection))
+print("The intersection has {} elements".format(len(intersection)))
 
 #filter results obtained from LSH and plot intersection for different values of r and b
+#Compute False positive and false negative

@@ -8,7 +8,7 @@ class LSH():
         self.r = r
         assert b*r == len(signature_mat[0]) , "The product b*r should be equal to the number of rows in the signature matrix"
         self.similar_docs = set()
-        self.hash_fn = hashFamily(32)
+        self.hash_fn = hashFamily(100)
 
     def computeLSH(self) -> set:
         hash_in_docs = dict()

@@ -12,7 +12,8 @@ class MinwiseHashing:
         self.n_of_hash = n_of_hash
         #populate list of hash functions
         for i in range(self.n_of_hash):
-            self.hash_family.append(hashFamily(i))
+            j=100+i
+            self.hash_family.append(hashFamily(j))
 
     def orderShingles(self):
         set_of_shingles = set()

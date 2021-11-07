@@ -5,12 +5,12 @@ class Shingle:
         self.k = k
         self.shingle_set = set()
         self.docId = docId
-        self.hash_fn = hashFamily(32)
+        self.hash_fn = hashFamily(100)
 
     def createShingles(self, doc:list):
         text = ' '.join(doc)
         self.doc_len = len(text)
-        if(self.doc_len < self.k): #Some descriptions are too short
+        if(self.doc_len < self.k): #Some descriptions could be too short
             raise ValueError("!-------Document %s is too short to create a shingle-------!" %(self.docId))
         for i in range(self.doc_len - self.k +1): #some announcements are too short -> handle this case somehow
             doc_shingle = text[i:i+self.k]
