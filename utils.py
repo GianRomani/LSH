@@ -1,6 +1,5 @@
 import csv
 import string
-from tqdm.notebook import tqdm
 from typing import *
 
 from bs4 import BeautifulSoup
@@ -10,20 +9,25 @@ from nltk.stem import SnowballStemmer
 from nltk.stem import WordNetLemmatizer
 import hashlib
 
-# Implement a family of hash functions. It hashes strings and takes an
-# integer to define the member of the family.
-# Return a hash function parametrized by i
-def hashFamily(i):
-    resultSize = 8
-    # how many bytes we want back
-    maxLen = 20
-    # how long can our i be (in decimal)
-    salt = str(i).zfill(maxLen)[-maxLen:]
-    def hashMember(x):
-        sequence = x + salt
-        return hashlib.sha1(sequence.encode("utf-8")).digest()[-resultSize:]
-    return hashMember
+def hashFamily(i:int):
+  """
+  Implement a family of hash functions.
+  
+  Args:
+      i (int): integer that defines the member of the family.
 
+  Returns:
+      hashMember: Return a hash function parametrized by i.
+  """
+  resultSize = 8
+  # how many bytes we want back
+  maxLen = 20
+  # how long can our i be (in decimal)
+  salt = str(i).zfill(maxLen)[-maxLen:]
+  def hashMember(x):
+      sequence = x + salt
+      return hashlib.sha1(sequence.encode("utf-8")).digest()[-resultSize:]
+  return hashMember
 
 #Downloads for stopwords and punctuation
 nltk.download('stopwords')
@@ -31,15 +35,18 @@ stopwords = nltk.corpus.stopwords.words('italian')
 nltk.download('wordnet')
 string.punctuation
 
+#Removing html elements
 def remove_html(text: string):
     soup = BeautifulSoup(text, "html.parser")
     cleaned_text = soup.get_text(separator=" ")
     return cleaned_text
 
+#Removing accented chars
 def remove_accented_chars(text: string):
     text = unidecode.unidecode(text)
     return text
 
+#Removing stopwords
 def remove_stopwords(text: string):
   output= [i for i in text.split() if i not in stopwords]
   return output
@@ -66,32 +73,48 @@ def remove_numbers(text: string):
   string_without_numbers = ''.join(list_without_numbers)
   return string_without_numbers
 
-
+#Lemmatization
 def lemmatizer(text: string):
-  wordnet_lemmatizer = WordNetLemmatizer()
-  lemm_text = [wordnet_lemmatizer.lemmatize(word) for word in text]
-  return lemm_text
+    wordnet_lemmatizer = WordNetLemmatizer()
+    lemm_text = [wordnet_lemmatizer.lemmatize(word) for word in text]
+    return lemm_text
 
 #Stemming
 
 def stemming(text: string):
-  italian_stemmer = SnowballStemmer('italian')
-  stem_text = [italian_stemmer.stem(word) for word in text if not word.isdigit()]
-  return stem_text
+    italian_stemmer = SnowballStemmer('italian')
+    stem_text = [italian_stemmer.stem(word) for word in text if not word.isdigit()]
+    return stem_text
 
-def preprocess(text: string, html=1, accent=1, punct=1, numb=1, stop=1, lemma=0, stem=1):
-    if html==1:
-        text = remove_html(text)
-    if accent==1:
-        text = remove_accented_chars(text)
-    if punct==1:
-        text = remove_punctuation(text)
-    if numb==1:
-        text = remove_numbers(text)
-    if stop==1:
-        text = remove_stopwords(text)
-    if lemma==1:
-        text = lemmatizer(text)
-    if stem==1:
-        text = stemming(text)
-    return text
+
+def preprocess(text: string, html=1, accent=0, punct=1, numb=1, stop=1, lemma=0, stem=1):
+  """Preprocess the data using this function
+
+  Args:
+      text (string): text to be preprocessed
+      html (int, optional): to delete html elements. Defaults to 1.
+      accent (int, optional): to delete accented chars. Defaults to 0.
+      punct (int, optional): to delete punctuation. Defaults to 1.
+      numb (int, optional): to delete numbers. Defaults to 1.
+      stop (int, optional): to delete stopwords. Defaults to 1.
+      lemma (int, optional): to apply lemmatization. Defaults to 0.
+      stem (int, optional): to apply stemming. Defaults to 1.
+
+  Returns:
+      [type]: preprocessed text
+  """
+  if html==1:
+      text = remove_html(text)
+  if accent==1:
+      text = remove_accented_chars(text)
+  if punct==1:
+      text = remove_punctuation(text)
+  if numb==1:
+      text = remove_numbers(text)
+  if stop==1:
+      text = remove_stopwords(text)
+  if lemma==1:
+      text = lemmatizer(text)
+  if stem==1:
+      text = stemming(text)
+  return text
