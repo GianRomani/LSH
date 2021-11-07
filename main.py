@@ -1,4 +1,4 @@
-from MinwiseHashing import MinwiseHashing
+from MinHashing import *
 from Shingles import *
 from LSH import *
 from NearestNeighbours import *
@@ -39,13 +39,13 @@ def main():
     print("Populating the signature matrix...")
     start = time.time()
     #Build a signture matrix of 100 rows
-    minhashing = MinwiseHashing(set_of_shingles,100)
+    minhashing = MinHashing(set_of_shingles,100)
     minhashing.numberOfShingles()
     minhashing.signatureMatrix()
     end = time.time()
     print("...Done!")
     print("Time spent for MinHashing: {}".format(end-start))
-    
+
     #Use LSH with 20 bands of 5 rows each
     print("LSH is working...")
     start = time.time()

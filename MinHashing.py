@@ -2,7 +2,7 @@ from utils import *
 import heapq
 import sys
 
-class MinwiseHashing:
+class MinHashing:
     """
     Build the signature matrix
     """
@@ -39,7 +39,6 @@ class MinwiseHashing:
         self.signature_matrix = []
         for shingle_doc in self.collection: #for each document...
             signature = []
-            hash_integer = 0 
 
             for h in self.hash_family: #for each hash function, i.e. for each row of the signature matrix
                 minHashSignature = 2**64 #big number
@@ -48,7 +47,7 @@ class MinwiseHashing:
                     hashSignature = int.from_bytes(h(str(s)), sys.byteorder) %self.number_of_shingles
                     if hashSignature < minHashSignature:
                         minHashSignature = hashSignature
-                #append signature oto the doc column
+                #append signature into the doc column
                 signature.append(minHashSignature)
             #append the document column to the matrix
             self.signature_matrix.append(signature)
