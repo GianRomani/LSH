@@ -1,6 +1,6 @@
 # LSH - Implementation of Locality Sensitive Hashing algorithm for jobs announcements in Kijiji website
 
-This project was made for a Data Mining course (winter 2021) and focuses on finding duplicates among CS jobs announcements from Kijiji website (the annoucements previously downloaded and are stored into docs/jobs.csv).
+This project was made for a Data Mining course (winter 2021) and focuses on finding duplicates among CS jobs announcements from Kijiji website (the annoucements were downloaded previously and are stored into docs/jobs.csv).
 
 To run the program use: python main.py.
 The main just calls the functions defined in the other files, keeps track of the time needed to use the two approaches for nearest-neighbours and print some statistics (false positives, number of duplicates etc).
