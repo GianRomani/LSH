@@ -1,6 +1,8 @@
 # LSH - Implementation of Locality Sensitive Hashing algorithm for jobs announcements in Kijiji website
 
-This project was made for a Data Mining course (winter 2021) and focuses on finding duplicates among CS jobs announcements from Kijiji website (the annoucements were downloaded previously and are stored into docs/jobs.csv).
+This project was made for a Data Mining course (winter 2021) and focuses on finding duplicates among CS jobs announcements from Kijiji website (the annoucements were downloaded previously and are stored into docs/jobs.csv). There are two implementations, one using Spark and one without Spark.
+
+**No Spark**
 
 To run the program use: python main.py.
 The main just calls the functions defined in the other files, keeps track of the time needed to use the two approaches for nearest-neighbours and print some statistics (false positives, number of duplicates etc).
@@ -28,3 +30,22 @@ Lastly I compute the intersection over the sets returned by LSH and Neighbours, 
 
 50 bands of 2 rows each:
 ![50_2](https://user-images.githubusercontent.com/49344669/141646645-cc3b0545-dfbb-4cf2-8bc7-dc0988aef4b6.jpeg)
+
+**Spark**
+
+The code for this approach is LSH_spark.ipynb. I used Colab to solve this exercise, so the path for the jobs.tsv file has to be typed manually (there is a copy in docs/jobs.csv). The parameters of this version of LSH are the same as the previous version, 100 rows for the signature matrix and 20 bands of 5 rows each for the LSH.
+To load the data from the tsv file I had to specify an option("multiline"=True)  because of the newlines that could be found in the descriptions of the jobs, give a schema of the data to the reader and specify that the file was a tsv instead of a csv.
+
+![dataframe_original](https://user-images.githubusercontent.com/49344669/141647033-ccc26502-5200-4592-8327-13ed71c3ecbd.png)
+
+ The dataframe is structured as in the above figure.
+ For the preprocessing I used some classes and relative methods, like <i>Tokenizer</i>, <i>StopWordsRemover</i> and <i>SnowballStemmer</i>. The preprocessed text of a document is stored in a list that can be found in <i>words_stemmed</i> column. Next I created the docIds by adding a new column called <i>docId</i> thanks to a Window function ordered by the row number. After joining the list's elements in a string for each row, I turn the Dataframe into a rdd and get the shingles using a map to associate the docId to its list of shingles. The shingles are then hashed using the hash function given with the text of the homework. Before passing to the minHash phase, I needed to save into a dataframe the hashed shingles so that I can use them again to compare the documents with Jaccard similarity.
+ 
+ For the minHashing I used a map with an auxiliary function that computes the minimum value (among the hashes) that we have to keep into the signature matrix. 
+
+For LSH I first create the bands into the signature matrix by mapping from a shape (docId,[minhash_row1,minhash_row2,...,minhash_row100] to (docId,[ [minhash_band1_row1,...,minhash_band1_row5],[minhash_band2_row1,...,minhash_band2_row5],...], then I hashed the bands (and kept the docIds of course) and finally build the buckets using a reduceByKey() function to have as a key the hash and as value a list of docIds. At this point the only thing left to complete LSH is getting the pairs from the lists. 
+
+To compute the pairs using Jaccard similarity the first thing to do is to convert the Dataframe containing the hashed shingles into an rdd (and converting the bytearrays into bytes). Then it is needed a cartesian product to get all the possible pairs (minus the ones composed by two documents with same docId of course) so that we can map the result into a tuple of three elements: doc1, doc2 and Jaccard similarity. At this point we filter by comparing the Jaccard score with the threshold (0.8) and keep just the two docIds (with no repetition, so just one among (i,j) and (j,i) is kept). 
+
+
+To conclude the exercise there is a section with the computation of the intersection between the two sets, false positive ratio and false negative ratio. LSH returns 1379681 pairs of duplicates, Jaccard 1333048 and the intersection 1333048. There aren't any false negative pairs, i.e. LSH retrieves all the duplicates, and the false positive rate is a bit less than 0.01, so the results are similar to the ones obtained in exercise 2. The brute force approach results 5-6 times slower than LSH.
